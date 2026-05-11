@@ -1,13 +1,13 @@
 {
   "name": "project-lazarus-socratic-coach-netlify",
-  "version": "1.0.0",
+  "version": "1.1.0-google-sheets-storage",
   "type": "module",
   "scripts": {
     "dev": "netlify dev",
     "build": "echo \"No build step needed\""
   },
   "dependencies": {
-    "@netlify/blobs": "^9.1.2"
+    "google-auth-library": "^10.5.0"
   },
   "devDependencies": {
     "netlify-cli": "^23.9.0"
