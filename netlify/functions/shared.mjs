@@ -160,31 +160,28 @@ export function uuid() {
 function getBlobOptions() {
   const siteID =
     process.env.NETLIFY_BLOBS_SITE_ID ||
-    process.env.NETLIFY_SITE_ID ||
     process.env.SITE_ID;
 
   const token =
     process.env.NETLIFY_BLOBS_TOKEN ||
     process.env.NETLIFY_AUTH_TOKEN;
 
-  if (siteID && token) {
-    return {
-      siteID,
-      token
-    };
+  if (!siteID) {
+    throw new Error("Missing NETLIFY_BLOBS_SITE_ID environment variable.");
   }
 
-  return undefined;
+  if (!token) {
+    throw new Error("Missing NETLIFY_BLOBS_TOKEN environment variable.");
+  }
+
+  return {
+    siteID,
+    token
+  };
 }
 
 function openStore(name) {
-  const options = getBlobOptions();
-
-  if (options) {
-    return getStore(name, options);
-  }
-
-  return getStore(name);
+  return getStore(name, getBlobOptions());
 }
 
 export function getSessionsStore() {
