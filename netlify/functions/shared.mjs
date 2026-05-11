@@ -7,16 +7,56 @@ export const CONFIG = {
 };
 
 export const PROMPTS = [
-  { id: 1, title: "Viral Fuel Source", question: "Explain how the Lazarus Virus changes macromolecule use and why this weakens the body." },
-  { id: 2, title: "Enzyme Manipulation", question: "Explain how altered enzyme activity helps the virus replicate." },
-  { id: 3, title: "Immune System Failure", question: "Explain why immune system failure allows the infection to spread." },
-  { id: 4, title: "Nervous System Damage", question: "Connect nervous system damage to infected behavior." },
-  { id: 5, title: "Subject 47 vs. Subject 48", question: "Use Subject 47 and Subject 48 data to explain why one resisted infection and one did not." },
-  { id: 6, title: "Mutation and Vulnerability", question: "Explain how mutation type could affect immune resistance or vulnerability." },
-  { id: 7, title: "Cell Cycle and Viral Spread", question: "Explain why the cell cycle affects viral spread in different tissues." },
-  { id: 8, title: "Membrane Damage and Homeostasis", question: "Explain how membrane damage causes transport failure and loss of homeostasis." },
-  { id: 9, title: "Mitochondria and Ribosomes", question: "Explain how mitochondrial and ribosomal failure produce zombie-like symptoms." },
-  { id: 10, title: "Cell Type Targeting", question: "Explain why the virus infects animal eukaryotic cells but not bacteria or plant cells." }
+  {
+    id: 1,
+    title: "Viral Fuel Source",
+    question: "Explain how the Lazarus Virus changes macromolecule use and why this weakens the body."
+  },
+  {
+    id: 2,
+    title: "Enzyme Manipulation",
+    question: "Explain how altered enzyme activity helps the virus replicate."
+  },
+  {
+    id: 3,
+    title: "Immune System Failure",
+    question: "Explain why immune system failure allows the infection to spread."
+  },
+  {
+    id: 4,
+    title: "Nervous System Damage",
+    question: "Connect nervous system damage to infected behavior."
+  },
+  {
+    id: 5,
+    title: "Subject 47 vs. Subject 48",
+    question: "Use Subject 47 and Subject 48 data to explain why one resisted infection and one did not."
+  },
+  {
+    id: 6,
+    title: "Mutation and Vulnerability",
+    question: "Explain how mutation type could affect immune resistance or vulnerability."
+  },
+  {
+    id: 7,
+    title: "Cell Cycle and Viral Spread",
+    question: "Explain why the cell cycle affects viral spread in different tissues."
+  },
+  {
+    id: 8,
+    title: "Membrane Damage and Homeostasis",
+    question: "Explain how membrane damage causes transport failure and loss of homeostasis."
+  },
+  {
+    id: 9,
+    title: "Mitochondria and Ribosomes",
+    question: "Explain how mitochondrial and ribosomal failure produce zombie-like symptoms."
+  },
+  {
+    id: 10,
+    title: "Cell Type Targeting",
+    question: "Explain why the virus infects animal eukaryotic cells but not bacteria or plant cells."
+  }
 ];
 
 export const APPROVED_EVIDENCE = `
@@ -51,42 +91,22 @@ Station 3 evidence:
 - Plant cell walls may help resist infection.
 `;
 
-function getBlobOptions() {
-  const siteID =
-    process.env.NETLIFY_BLOBS_SITE_ID ||
-    process.env.NETLIFY_SITE_ID ||
-    process.env.SITE_ID;
-
-  const token =
-    process.env.NETLIFY_BLOBS_TOKEN ||
-    process.env.NETLIFY_AUTH_TOKEN;
-
-  if (siteID && token) {
-    return { siteID, token };
-  }
-
-  return undefined;
-}
-
-function openStore(name) {
-  const options = getBlobOptions();
-  return options ? getStore(name, options) : getStore(name);
-}
-
-export function getSessionsStore() {
-  return openStore("lazarus-s1-3-sessions");
-}
-
-export function getSubmissionsStore() {
-  return openStore("lazarus-s1-3-submissions");
-}
-
-export function getCountsStore() {
-  return openStore("lazarus-s1-3-counts");
+export function jsonResponse(statusCode, body) {
+  return {
+    statusCode,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store"
+    },
+    body: JSON.stringify(body)
+  };
 }
 
 export function parseBody(event) {
-  if (!event.body) return {};
+  if (!event.body) {
+    return {};
+  }
+
   try {
     return JSON.parse(event.body);
   } catch {
@@ -95,7 +115,10 @@ export function parseBody(event) {
 }
 
 export function cleanText(value, maxLength = 5000) {
-  if (value === null || value === undefined) return "";
+  if (value === null || value === undefined) {
+    return "";
+  }
+
   return String(value)
     .replace(/[<>]/g, "")
     .replace(/\s+/g, " ")
@@ -104,7 +127,10 @@ export function cleanText(value, maxLength = 5000) {
 }
 
 export function cleanLongText(value, maxLength = 12000) {
-  if (value === null || value === undefined) return "";
+  if (value === null || value === undefined) {
+    return "";
+  }
+
   return String(value)
     .replace(/[<>]/g, "")
     .trim()
@@ -131,53 +157,106 @@ export function uuid() {
   return crypto.randomUUID();
 }
 
+function getBlobOptions() {
+  const siteID =
+    process.env.NETLIFY_BLOBS_SITE_ID ||
+    process.env.NETLIFY_SITE_ID ||
+    process.env.SITE_ID;
+
+  const token =
+    process.env.NETLIFY_BLOBS_TOKEN ||
+    process.env.NETLIFY_AUTH_TOKEN;
+
+  if (siteID && token) {
+    return {
+      siteID,
+      token
+    };
+  }
+
+  return undefined;
+}
+
+function openStore(name) {
+  const options = getBlobOptions();
+
+  if (options) {
+    return getStore(name, options);
+  }
+
+  return getStore(name);
+}
+
 export function getSessionsStore() {
-  return getStore("lazarus-s1-3-sessions");
+  return openStore("lazarus-s1-3-sessions");
 }
 
 export function getSubmissionsStore() {
-  return getStore("lazarus-s1-3-submissions");
+  return openStore("lazarus-s1-3-submissions");
 }
 
 export function getCountsStore() {
-  return getStore("lazarus-s1-3-counts");
+  return openStore("lazarus-s1-3-counts");
 }
 
 export function getPromptById(id) {
   const prompt = PROMPTS.find((p) => Number(p.id) === Number(id));
-  if (!prompt) throw new Error("Invalid prompt ID.");
+
+  if (!prompt) {
+    throw new Error("Invalid prompt ID.");
+  }
+
   return prompt;
 }
 
 export async function pickBalancedPrompt() {
   const store = getCountsStore();
   const current = (await store.get("prompt-counts.json", { type: "json" })) || {};
-  const rows = PROMPTS.map((prompt) => ({
-    id: prompt.id,
-    count: Number(current[prompt.id] || 0)
-  }));
+
+  const rows = PROMPTS.map((prompt) => {
+    return {
+      id: prompt.id,
+      count: Number(current[prompt.id] || 0)
+    };
+  });
+
   const min = Math.min(...rows.map((row) => row.count));
   const candidates = rows.filter((row) => row.count === min);
   const selected = candidates[Math.floor(Math.random() * candidates.length)];
+
   current[selected.id] = Number(current[selected.id] || 0) + 1;
+
   await store.setJSON("prompt-counts.json", current);
+
   return getPromptById(selected.id);
 }
 
 export function compactHistory(history) {
-  if (!Array.isArray(history) || history.length === 0) return "No previous conversation.";
+  if (!Array.isArray(history) || history.length === 0) {
+    return "No previous conversation.";
+  }
+
   return history
     .slice(-12)
-    .map((item) => `${cleanText(item.role || "unknown", 20)}: ${cleanLongText(item.text || "", 1200)}`)
+    .map((item) => {
+      const role = cleanText(item.role || "unknown", 20);
+      const text = cleanLongText(item.text || "", 1200);
+      return `${role}: ${text}`;
+    })
     .join("\n");
 }
 
 export function trimHistory(history) {
-  if (!Array.isArray(history)) return [];
-  return history.slice(-30).map((item) => ({
-    role: cleanText(item.role || "unknown", 20),
-    text: cleanLongText(item.text || "", 1200)
-  }));
+  if (!Array.isArray(history)) {
+    return [];
+  }
+
+  return history.slice(-30).map((item) => {
+    return {
+      role: cleanText(item.role || "unknown", 20),
+      text: cleanLongText(item.text || "", 1200)
+    };
+  });
 }
 
 export function tutorInstructions() {
@@ -248,13 +327,27 @@ export function evaluationResponseFormat() {
         type: "object",
         additionalProperties: false,
         properties: {
-          claimScore: { type: "integer" },
-          evidenceScore: { type: "integer" },
-          reasoningScore: { type: "integer" },
-          biologyAccuracyScore: { type: "integer" },
-          strength: { type: "string" },
-          misconceptionOrMissingPiece: { type: "string" },
-          suggestedTeacherFollowUp: { type: "string" }
+          claimScore: {
+            type: "integer"
+          },
+          evidenceScore: {
+            type: "integer"
+          },
+          reasoningScore: {
+            type: "integer"
+          },
+          biologyAccuracyScore: {
+            type: "integer"
+          },
+          strength: {
+            type: "string"
+          },
+          misconceptionOrMissingPiece: {
+            type: "string"
+          },
+          suggestedTeacherFollowUp: {
+            type: "string"
+          }
         },
         required: [
           "claimScore",
@@ -273,41 +366,63 @@ export function evaluationResponseFormat() {
 export async function callOpenAI(instructions, input, maxTokens = 900, responseFormat = null) {
   const apiKey = process.env.OPENAI_API_KEY;
   const model = process.env.OPENAI_MODEL || CONFIG.DEFAULT_MODEL;
-  if (!apiKey) throw new Error("Missing OPENAI_API_KEY environment variable.");
+
+  if (!apiKey) {
+    throw new Error("Missing OPENAI_API_KEY environment variable.");
+  }
 
   const payload = {
     model,
     messages: [
-      { role: "system", content: instructions },
-      { role: "user", content: input }
+      {
+        role: "system",
+        content: instructions
+      },
+      {
+        role: "user",
+        content: input
+      }
     ],
     temperature: responseFormat ? 0 : 0.3,
     max_completion_tokens: Math.max(maxTokens, 900)
   };
 
-  if (responseFormat) payload.response_format = responseFormat;
+  if (responseFormat) {
+    payload.response_format = responseFormat;
+  }
 
   const response = await fetch(CONFIG.OPENAI_API_URL, {
     method: "POST",
     headers: {
-      "authorization": `Bearer ${apiKey}`,
+      authorization: `Bearer ${apiKey}`,
       "content-type": "application/json"
     },
     body: JSON.stringify(payload)
   });
 
   const raw = await response.text();
-  if (!response.ok) throw new Error(`OpenAI API error ${response.status}: ${raw}`);
+
+  if (!response.ok) {
+    throw new Error(`OpenAI API error ${response.status}: ${raw}`);
+  }
 
   const data = JSON.parse(raw);
   const content = data?.choices?.[0]?.message?.content;
-  if (!content) throw new Error(`No text returned from OpenAI. Raw: ${raw.slice(0, 1000)}`);
+
+  if (!content) {
+    throw new Error(`No text returned from OpenAI. Raw: ${raw.slice(0, 1000)}`);
+  }
+
   return String(content).trim();
 }
 
 export function clampScore(value) {
   const number = Number(value);
-  if (Number.isNaN(number)) return 0;
+
+  if (Number.isNaN(number)) {
+    return 0;
+  }
+
   return Math.max(0, Math.min(2, Math.round(number)));
 }
 
@@ -318,14 +433,21 @@ export function sanitizeEvaluation(evaluation) {
     reasoningScore: clampScore(evaluation.reasoningScore),
     biologyAccuracyScore: clampScore(evaluation.biologyAccuracyScore),
     strength: cleanLongText(evaluation.strength || "No specific strength identified.", 1000),
-    misconceptionOrMissingPiece: cleanLongText(evaluation.misconceptionOrMissingPiece || "Needs more specific evidence or reasoning.", 1000),
-    suggestedTeacherFollowUp: cleanLongText(evaluation.suggestedTeacherFollowUp || "Review claim, evidence, and reasoning.", 1000)
+    misconceptionOrMissingPiece: cleanLongText(
+      evaluation.misconceptionOrMissingPiece || "Needs more specific evidence or reasoning.",
+      1000
+    ),
+    suggestedTeacherFollowUp: cleanLongText(
+      evaluation.suggestedTeacherFollowUp || "Review claim, evidence, and reasoning.",
+      1000
+    )
   };
 }
 
 export async function runSaplingSafely(text) {
   try {
     const key = process.env.SAPLING_API_KEY;
+
     if (!key) {
       return {
         score: "",
@@ -336,7 +458,9 @@ export async function runSaplingSafely(text) {
 
     const response = await fetch(CONFIG.SAPLING_API_URL, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: {
+        "content-type": "application/json"
+      },
       body: JSON.stringify({
         key,
         text: String(text || ""),
@@ -346,16 +470,26 @@ export async function runSaplingSafely(text) {
     });
 
     const raw = await response.text();
-    if (!response.ok) throw new Error(`Sapling API error ${response.status}: ${raw}`);
+
+    if (!response.ok) {
+      throw new Error(`Sapling API error ${response.status}: ${raw}`);
+    }
 
     const data = JSON.parse(raw);
     const score = typeof data.score === "number" ? data.score : "";
+
     let riskLevel = "Unavailable";
+
     if (typeof score === "number") {
-      if (score >= 0.85) riskLevel = "High";
-      else if (score >= 0.65) riskLevel = "Medium";
-      else if (score >= 0.4) riskLevel = "Low-Medium";
-      else riskLevel = "Low";
+      if (score >= 0.85) {
+        riskLevel = "High";
+      } else if (score >= 0.65) {
+        riskLevel = "Medium";
+      } else if (score >= 0.4) {
+        riskLevel = "Low-Medium";
+      } else {
+        riskLevel = "Low";
+      }
     }
 
     return {
