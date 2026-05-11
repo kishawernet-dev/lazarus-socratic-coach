@@ -51,15 +51,38 @@ Station 3 evidence:
 - Plant cell walls may help resist infection.
 `;
 
-export function jsonResponse(statusCode, body) {
-  return {
-    statusCode,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store"
-    },
-    body: JSON.stringify(body)
-  };
+function getBlobOptions() {
+  const siteID =
+    process.env.NETLIFY_BLOBS_SITE_ID ||
+    process.env.NETLIFY_SITE_ID ||
+    process.env.SITE_ID;
+
+  const token =
+    process.env.NETLIFY_BLOBS_TOKEN ||
+    process.env.NETLIFY_AUTH_TOKEN;
+
+  if (siteID && token) {
+    return { siteID, token };
+  }
+
+  return undefined;
+}
+
+function openStore(name) {
+  const options = getBlobOptions();
+  return options ? getStore(name, options) : getStore(name);
+}
+
+export function getSessionsStore() {
+  return openStore("lazarus-s1-3-sessions");
+}
+
+export function getSubmissionsStore() {
+  return openStore("lazarus-s1-3-submissions");
+}
+
+export function getCountsStore() {
+  return openStore("lazarus-s1-3-counts");
 }
 
 export function parseBody(event) {
