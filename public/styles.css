@@ -1,0 +1,124 @@
+:root {
+  --lime:#a8d94a;
+  --lime2:#bff35b;
+  --black:#050607;
+  --charcoal:#14191c;
+  --cream:#f4f1e9;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  padding:24px;
+  color:var(--cream);
+  font-family:Arial, Helvetica, sans-serif;
+  background:radial-gradient(circle at top center, rgba(168,217,74,.16), transparent 26%), linear-gradient(135deg,#060808 0%,#1f282d 48%,#050607 100%);
+}
+
+.wrap { max-width:1040px; margin:0 auto; }
+
+.cover {
+  position:relative;
+  min-height:440px;
+  border:14px solid var(--lime);
+  box-shadow:0 0 0 4px #111,0 18px 45px rgba(0,0,0,.55);
+  margin-bottom:24px;
+  overflow:hidden;
+  background:linear-gradient(rgba(5,6,7,.58),rgba(5,6,7,.72)), linear-gradient(90deg,#10161a 0%,#3c474b 50%,#111719 100%);
+}
+
+.cover:before {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(90deg,transparent 0px,transparent 38px,rgba(0,0,0,.18) 39px,rgba(0,0,0,.18) 42px);
+  opacity:.35;
+}
+
+.building { position:absolute; bottom:0; width:95px; background:linear-gradient(#1d2428,#080a0b); border-left:2px solid rgba(255,255,255,.05); border-right:2px solid rgba(255,255,255,.04); }
+.b1{left:0;height:90%}.b2{left:10%;height:76%;width:115px}.b3{left:24%;height:82%}.b4{right:4%;height:88%;width:118px}.b5{right:18%;height:70%}.b6{right:31%;height:55%;width:72px}
+
+.building:after {
+  content:"";
+  position:absolute;
+  inset:12px;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.09) 0 3px,transparent 3px 18px), repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 3px,transparent 3px 18px);
+  opacity:.5;
+}
+
+.haze { position:absolute; inset:0; background:radial-gradient(circle at 50% 25%,rgba(255,255,255,.35),transparent 26%), linear-gradient(180deg,rgba(255,255,255,.18),transparent 45%); opacity:.6; }
+
+.zombie {
+  position:absolute;
+  left:46%;
+  bottom:12px;
+  width:170px;
+  height:315px;
+  transform:translateX(-50%);
+  background:#000;
+  clip-path:polygon(44% 0,59% 4%,67% 14%,64% 28%,56% 36%,59% 55%,72% 72%,65% 78%,55% 62%,54% 100%,42% 100%,40% 62%,29% 79%,20% 72%,35% 54%,36% 34%,28% 29%,25% 16%,31% 6%);
+  filter:drop-shadow(10px 0 0 rgba(0,0,0,.45));
+  z-index:3;
+}
+
+.main-title {
+  position:absolute;
+  z-index:4;
+  top:145px;
+  left:9%;
+  right:8%;
+  text-align:center;
+  color:var(--lime);
+  font-size:82px;
+  letter-spacing:4px;
+  font-weight:900;
+  line-height:.9;
+  text-transform:uppercase;
+  text-shadow:8px 8px 0 rgba(0,0,0,.45);
+  font-family:Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+}
+
+.subtitle { position:absolute; z-index:4; top:270px; left:0; right:0; text-align:center; color:var(--cream); font-size:25px; letter-spacing:9px; font-weight:900; text-transform:uppercase; text-shadow:4px 4px 0 #000; }
+.genesis-mark { position:absolute; z-index:4; bottom:46px; left:0; right:0; text-align:center; color:var(--cream); font-size:45px; font-weight:900; letter-spacing:4px; text-shadow:4px 4px 0 #000; }
+.genesis-sub { display:block; font-size:18px; letter-spacing:8px; margin-top:3px; }
+.dna-mini { position:absolute; z-index:4; bottom:27px; left:50%; transform:translateX(-50%); width:78px; height:110px; opacity:.95; filter:drop-shadow(4px 4px 0 rgba(0,0,0,.8)); }
+
+.card { border:3px solid var(--lime); border-radius:14px; padding:20px; margin-bottom:18px; background:rgba(20,25,28,.96); color:var(--cream); box-shadow:0 5px 0 #000; }
+h1,h2,h3 { color:var(--lime2); margin-top:0; }
+label { display:block; font-weight:900; margin-top:12px; }
+input,select,textarea { width:100%; font-size:16px; padding:11px; border:2px solid var(--lime); border-radius:9px; margin-top:5px; background:#f7f5ee; color:#111; }
+input:focus,select:focus,textarea:focus { outline:none; box-shadow:0 0 0 4px rgba(168,217,74,.28); }
+textarea { min-height:115px; resize:vertical; line-height:1.4; }
+button { background:var(--lime); color:#111; border:none; border-radius:11px; padding:12px 18px; font-size:16px; font-weight:900; cursor:pointer; margin-top:14px; margin-right:8px; box-shadow:0 4px 0 #6e911f; }
+button.warning { background:#8b1515; color:#fff; box-shadow:0 4px 0 #4f0808; }
+button:disabled { background:#777; color:#222; cursor:not-allowed; box-shadow:none; }
+.hidden { display:none; }
+.row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.promptBox { border:3px dashed var(--lime); border-radius:12px; padding:14px; background:#0d1113; margin-top:10px; }
+.chat { border:2px solid var(--lime); border-radius:12px; padding:12px; min-height:220px; max-height:420px; overflow-y:auto; background:#080a0b; }
+.msg { padding:10px; margin:8px 0; border-radius:10px; line-height:1.4; white-space:pre-wrap; }
+.student { background:#e8f0fe; color:#111; border:2px solid #9fc2df; }
+.coach { background:#eff9d7; color:#111; border:2px solid var(--lime); }
+.system { background:#fff2c4; color:#111; border:2px solid #f0c85a; }
+.status,.saveNote { margin-top:10px; font-weight:900; color:var(--lime2); white-space:pre-wrap; }
+.security-note { border-left:5px solid var(--lime); padding:10px 12px; background:rgba(0,0,0,.35); border-radius:8px; }
+
+.ai-warning {
+  border:3px solid #8b1515;
+  border-radius:12px;
+  padding:14px;
+  margin-top:16px;
+  background:linear-gradient(135deg,rgba(139,21,21,.92),rgba(20,25,28,.96));
+  color:var(--cream);
+  box-shadow:0 4px 0 #000;
+}
+.ai-warning h3 { color:#fff2c4; margin:0 0 8px 0; letter-spacing:1px; text-transform:uppercase; }
+.ai-warning p { margin:7px 0; line-height:1.42; }
+.ack-row { display:flex; align-items:flex-start; gap:10px; margin-top:12px; padding:10px; border-radius:10px; background:rgba(0,0,0,.32); }
+.ack-row input { width:auto; margin-top:3px; transform:scale(1.25); accent-color:var(--lime); }
+.ack-row label { margin-top:0; font-weight:900; line-height:1.35; }
+
+@media (max-width:760px) {
+  body{padding:14px}.row{grid-template-columns:1fr}.cover{min-height:320px;border-width:9px}.main-title{top:105px;font-size:44px}.subtitle{top:184px;font-size:14px;letter-spacing:4px}.genesis-mark{font-size:28px;bottom:38px}.genesis-sub{font-size:12px;letter-spacing:5px}.zombie{height:230px;width:125px}.dna-mini{width:58px;height:82px}
+}
