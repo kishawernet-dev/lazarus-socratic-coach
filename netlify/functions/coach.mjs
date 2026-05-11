@@ -3,7 +3,9 @@ import {
   parseBody,
   cleanText,
   cleanLongText,
-  getSessionsStore,
+  ensureSheetSetup,
+  findActiveSessionByKey,
+  updateActiveSession,
   getPromptById,
   compactHistory,
   trimHistory,
@@ -16,6 +18,8 @@ export const handler = async (event) => {
   try {
     if (event.httpMethod !== "POST") return jsonResponse(405, { error: "Method not allowed" });
 
+    await ensureSheetSetup();
+
     const body = parseBody(event);
     const sessionKey = cleanText(body.sessionKey, 200);
     const message = cleanLongText(body.message, 2000);
@@ -24,11 +28,12 @@ export const handler = async (event) => {
     if (!sessionKey) return jsonResponse(400, { error: "Session missing. Refresh and start again." });
     if (!message) return jsonResponse(400, { error: "Type a response before sending." });
 
-    const store = getSessionsStore();
-    const session = await store.get(sessionKey, { type: "json" });
-    if (!session || session.status !== "ACTIVE") return jsonResponse(404, { error: "Active session not found." });
+    const found = await findActiveSessionByKey(sessionKey);
+    if (!found) return jsonResponse(404, { error: "Active session not found." });
 
+    const session = found.session;
     const prompt = getPromptById(session.promptId);
+
     const input = `
 Student: ${session.studentName}
 Period: ${session.period}
@@ -49,9 +54,9 @@ ${message}
     const reply = await callOpenAI(tutorInstructions(), input, 900, null);
     const updatedHistory = trimHistory([...history, { role: "coach", text: reply }]);
 
-    session.history = updatedHistory;
-    session.updatedAt = new Date().toISOString();
-    await store.setJSON(sessionKey, session);
+    await updateActiveSession(sessionKey, {
+      history: updatedHistory
+    });
 
     return jsonResponse(200, { reply, history: updatedHistory });
   } catch (error) {
