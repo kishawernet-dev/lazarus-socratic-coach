@@ -3,9 +3,10 @@ import {
   parseBody,
   cleanText,
   cleanLongText,
-  getSessionsStore,
-  getSubmissionsStore,
-  makeSubmissionKey,
+  ensureSheetSetup,
+  findActiveSessionByKey,
+  updateActiveSession,
+  appendSubmissionRecord,
   getPromptById,
   compactHistory,
   trimHistory,
@@ -21,6 +22,8 @@ export const handler = async (event) => {
   try {
     if (event.httpMethod !== "POST") return jsonResponse(405, { error: "Method not allowed" });
 
+    await ensureSheetSetup();
+
     const body = parseBody(event);
     const sessionKey = cleanText(body.sessionKey, 200);
     const finalResponse = cleanLongText(body.finalResponse, 10000);
@@ -29,12 +32,10 @@ export const handler = async (event) => {
     if (!sessionKey) return jsonResponse(400, { error: "Session missing." });
     if (finalResponse.length < 40) return jsonResponse(400, { error: "Your final response needs more detail before submission." });
 
-    const sessionStore = getSessionsStore();
-    const submissionStore = getSubmissionsStore();
-    const session = await sessionStore.get(sessionKey, { type: "json" });
+    const found = await findActiveSessionByKey(sessionKey);
+    if (!found) return jsonResponse(404, { error: "Active session not found." });
 
-    if (!session || session.status !== "ACTIVE") return jsonResponse(404, { error: "Active session not found." });
-
+    const session = found.session;
     const prompt = getPromptById(session.promptId);
 
     const input = `
@@ -58,6 +59,7 @@ ${finalResponse}
 
     const evaluationText = await callOpenAI(evaluatorInstructions(), input, 1500, evaluationResponseFormat());
     const evaluation = sanitizeEvaluation(JSON.parse(evaluationText));
+
     const total =
       Number(evaluation.claimScore) +
       Number(evaluation.evidenceScore) +
@@ -65,8 +67,8 @@ ${finalResponse}
       Number(evaluation.biologyAccuracyScore);
 
     const aiDetection = await runSaplingSafely(finalResponse);
-
     const submittedAt = new Date().toISOString();
+
     const submission = {
       submittedAt,
       firstName: session.firstName,
@@ -84,14 +86,14 @@ ${finalResponse}
       chatHistory: history
     };
 
-    await submissionStore.setJSON(makeSubmissionKey(session.sessionId), submission);
+    await appendSubmissionRecord(submission);
 
-    session.finalDraft = finalResponse;
-    session.history = history;
-    session.status = "SUBMITTED";
-    session.submittedAt = submittedAt;
-    session.updatedAt = submittedAt;
-    await sessionStore.setJSON(sessionKey, session);
+    await updateActiveSession(sessionKey, {
+      finalDraft: finalResponse,
+      history,
+      status: "SUBMITTED",
+      submittedAt
+    });
 
     return jsonResponse(200, {
       message: "Submitted. Your response has been sent to your teacher.",
