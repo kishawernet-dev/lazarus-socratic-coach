@@ -1,4 +1,9 @@
-import { jsonResponse, getSubmissionsStore, cleanText } from "./shared.mjs";
+import {
+  jsonResponse,
+  cleanText,
+  ensureSheetSetup,
+  getSubmissionRecords
+} from "./shared.mjs";
 
 export const handler = async (event) => {
   try {
@@ -13,18 +18,10 @@ export const handler = async (event) => {
       return jsonResponse(401, { error: "Unauthorized." });
     }
 
-    const store = getSubmissionsStore();
-    const listed = await store.list({ prefix: "submitted/" });
-    const rows = [];
+    await ensureSheetSetup();
+    const submissions = await getSubmissionRecords();
 
-    for (const blob of listed.blobs || []) {
-      const record = await store.get(blob.key, { type: "json" });
-      if (record) rows.push(record);
-    }
-
-    rows.sort((a, b) => String(b.submittedAt).localeCompare(String(a.submittedAt)));
-
-    return jsonResponse(200, { submissions: rows });
+    return jsonResponse(200, { submissions });
   } catch (error) {
     return jsonResponse(500, { error: String(error.message || error) });
   }
