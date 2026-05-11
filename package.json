@@ -1,0 +1,15 @@
+{
+  "name": "project-lazarus-socratic-coach-netlify",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo \"No build step needed\""
+  },
+  "dependencies": {
+    "@netlify/blobs": "^9.1.2"
+  },
+  "devDependencies": {
+    "netlify-cli": "^23.9.0"
+  }
+}
